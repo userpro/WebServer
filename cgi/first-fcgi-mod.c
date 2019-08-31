@@ -4,8 +4,8 @@
 
 #include "../fastcgi.h"
 #include "../log.h"
-#include "../vector/qwq_hashmap.h"
-#include "../vector/qwq_string.h"
+#include "../vendor/qwq_hashmap.h"
+#include "../vendor/qwq_string.h"
 
 void* first_resp_handle(int connfd, qwq_fastcgi* fcgi, void** func_params) {
     LOGI("first_resp_handle");

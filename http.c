@@ -2,10 +2,10 @@
 #include <fcntl.h>
 #include <string.h>
 
-#include "./vector/qwq_hashmap.h"
-#include "./vector/qwq_mix.h"
-#include "./vector/qwq_string.h"
-#include "./vector/qwq_utils.h"
+#include "./vendor/qwq_hashmap.h"
+#include "./vendor/qwq_mix.h"
+#include "./vendor/qwq_string.h"
+#include "./vendor/qwq_utils.h"
 
 #include "config.h"
 #include "fastcgi.h"

@@ -5,8 +5,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "./vector/qwq_hashmap.h"
-#include "./vector/qwq_string.h"
+#include "./vendor/qwq_hashmap.h"
+#include "./vendor/qwq_string.h"
 
 typedef struct _http_request {
     qwq_string *method, *url, *proto;
