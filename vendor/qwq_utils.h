@@ -13,7 +13,7 @@
     do {                                          \
         if (!x->prev) {                           \
             head = x->next;                       \
-            if (x->next) x->next->prev = NULL;    \
+            if (head) head->prev = NULL;          \
         } else {                                  \
             x->prev->next = x->next;              \
             if (x->next) x->next->prev = x->prev; \

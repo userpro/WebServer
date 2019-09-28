@@ -437,7 +437,7 @@ void qwq_string_print(qwq_string* qwq) {
     printf("%s", qwq_string_to_cstr(qwq));
 }
 
-/* 为了兼容hashmap */
+/* 为了兼容qwq_hashmap */
 
 unsigned long qwq_string_hmap_hash(void* qwq_obj) {
     return qwq_string_hash((qwq_string*) qwq_obj);

@@ -1,14 +1,22 @@
 #ifndef QWQ_HASHMAP_H_
+/*
+    key值提供以下方法
+        unsigned long hashcode(void*) 必须
+        int cmp(void*, void*) 必须
+        void free(void*)
+    val值提供以下方法
+        void free(void*)
+*/
 #define QWQ_HASHMAP_H_
 
-enum HASHMAP_TYPE {
+enum QWQ_HASHMAP_TYPE {
     QWQ_STRING = 1,
     QWQ_OBJECT = 2,
     QWQ_UNKNOWN = -1,
 };
 
 typedef struct _qwq_hashmap_key {
-    enum HASHMAP_TYPE type;
+    enum QWQ_HASHMAP_TYPE type;
     void* data;
     unsigned long (*hashcode)(void*);
     int (*cmp)(void*, void*);
@@ -16,7 +24,7 @@ typedef struct _qwq_hashmap_key {
 } qwq_hashmap_key;
 
 typedef struct _qwq_hashmap_val {
-    enum HASHMAP_TYPE type;
+    enum QWQ_HASHMAP_TYPE type;
     void* data;
     void (*free)(void*);
 } qwq_hashmap_val;
@@ -35,19 +43,17 @@ typedef struct _qwq_hashmap {
     qwq_hashmap_kv **data, *head;
 } qwq_hashmap;
 
-/* 所有函数都不会修改或释放传入的内存 */
-
-qwq_hashmap_key* qwq_hashmap_make_key(enum HASHMAP_TYPE type,
+qwq_hashmap_key* qwq_hashmap_make_key(enum QWQ_HASHMAP_TYPE type,
                                       void* data,
                                       unsigned long (*hashcode)(void*),
                                       int (*cmp)(void*, void*),
                                       void (*free)(void*));
 
-qwq_hashmap_val* qwq_hashmap_make_val(enum HASHMAP_TYPE type,
+qwq_hashmap_val* qwq_hashmap_make_val(enum QWQ_HASHMAP_TYPE type,
                                       void* data,
                                       void (*free)(void*));
 
-// 删除管理结果及数据
+// 删除管理结构及数据
 void qwq_hashmap_del_key(qwq_hashmap_key* qwq_key);
 void qwq_hashmap_del_val(qwq_hashmap_val* qwq_val);
 

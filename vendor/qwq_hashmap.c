@@ -4,13 +4,13 @@
 #include "qwq_utils.h"
 
 /*
-    kv
-   /  \
-  /    \
-key    val
- |      |
- |      |
-data   data
+        kv
+       /  \
+      /    \
+    key    val
+     |      |
+     |      |
+    data   data
  */
 
 #define DEFAULT_CAPACITY 8
@@ -98,7 +98,7 @@ static int qwq_hashmap_resize(qwq_hashmap** old_qwq, int new_cap) {
     return 0;
 }
 
-qwq_hashmap_key* qwq_hashmap_make_key(enum HASHMAP_TYPE type,
+qwq_hashmap_key* qwq_hashmap_make_key(enum QWQ_HASHMAP_TYPE type,
                                       void* data,
                                       unsigned long (*hashcode)(void*),
                                       int (*cmp)(void*, void*),
@@ -116,7 +116,7 @@ qwq_hashmap_key* qwq_hashmap_make_key(enum HASHMAP_TYPE type,
     return key;
 }
 
-qwq_hashmap_val* qwq_hashmap_make_val(enum HASHMAP_TYPE type,
+qwq_hashmap_val* qwq_hashmap_make_val(enum QWQ_HASHMAP_TYPE type,
                                       void* data,
                                       void (*free)(void*)) {
     qwq_hashmap_val* val = NULL;
@@ -170,23 +170,23 @@ qwq_hashmap* qwq_hashmap_new2(int capacity) {
     失败 => -1
     重复 => -2
 */
-int qwq_hashmap_set(qwq_hashmap** _qmap,
+int qwq_hashmap_set(qwq_hashmap** qmap,
                     qwq_hashmap_key* key,
                     qwq_hashmap_val* val) {
     // LOGI("qwq_hashmap_set");
-    if (!_qmap || !key || !val) {
+    if (!qmap || !key || !val) {
         return -1;
     }
     if (!key->hashcode || !key->cmp) {
         return -1;
     }
-    qwq_hashmap* qmap = *_qmap;
-    if (!qmap) {
+    qwq_hashmap* _qmap = *qmap;
+    if (!_qmap) {
         return -1;
     }
 
     int hash_idx, final_idx;
-    hash_idx = key->hashcode(key->data) % qmap->capacity;
+    hash_idx = key->hashcode(key->data) % _qmap->capacity;
     // LOGI("capacity: %d  hash_idx: %d", qmap->capacity, hash_idx);
 
     qwq_hashmap_kv* new_qwq_kv = NULL;
@@ -196,15 +196,15 @@ int qwq_hashmap_set(qwq_hashmap** _qmap,
     }
 
     // 没有发生冲突
-    if (!qmap->data[hash_idx]) {
+    if (!_qmap->data[hash_idx]) {
         final_idx = hash_idx;
         new_qwq_kv->index = final_idx;
-        qmap->data[final_idx] = new_qwq_kv;
+        _qmap->data[final_idx] = new_qwq_kv;
     } else {           // 发生冲突
         int tail_idx;  // 碰撞链最后一个
         // 查询 collision list
         qwq_hashmap_kv* nx_kv = NULL;
-        nx_kv = qmap->data[hash_idx];
+        nx_kv = _qmap->data[hash_idx];
         while (nx_kv) {
             // 如果找到重复 key, 则返回重复 key 值错误
             if (key->cmp(key->data, nx_kv->key->data) == 0) {
@@ -216,23 +216,23 @@ int qwq_hashmap_set(qwq_hashmap** _qmap,
         }
 
         // LOGI("tail_idx: %d", tail_idx);
-        final_idx = (tail_idx + 1) % qmap->capacity;
+        final_idx = (tail_idx + 1) % _qmap->capacity;
         // 从最后发生碰撞的地方向后寻找
-        while (qmap->data[final_idx] && final_idx != hash_idx) {
-            final_idx = (final_idx + 1) % qmap->capacity;
+        while (_qmap->data[final_idx] && final_idx != hash_idx) {
+            final_idx = (final_idx + 1) % _qmap->capacity;
         }
         new_qwq_kv->index = final_idx;
-        qmap->data[final_idx] = new_qwq_kv;
-        qmap->data[tail_idx]->collision_next = new_qwq_kv;
+        _qmap->data[final_idx] = new_qwq_kv;
+        _qmap->data[tail_idx]->collision_next = new_qwq_kv;
     }
 
     // 维护 qwq_hashmap_kv list
-    QWQ_DLINKLIST_INS_FRT(qmap->head, qmap->data[final_idx]);
+    QWQ_DLINKLIST_INS_FRT(_qmap->head, _qmap->data[final_idx]);
 
-    qmap->count++;
-    if (qmap->count > qmap->threshold) {
+    _qmap->count++;
+    if (_qmap->count > _qmap->threshold) {
         if (qwq_hashmap_resize(
-                    _qmap, qwq_utils_roundup_pow_of_two(qmap->capacity)) < 0) {
+                    qmap, qwq_utils_roundup_pow_of_two(_qmap->capacity)) < 0) {
             free(new_qwq_kv);
             return -1;
         }
